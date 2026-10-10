@@ -10,17 +10,22 @@ Backend for a healthcare application built with Django, Django REST Framework, P
 - djangorestframework-simplejwt
 - PostgreSQL
 - python-decouple for environment variables
+- drf-spectacular for Swagger docs
+- Docker and docker-compose
 
 ## Project Structure
 
 ```
 healthcare_backend/
 ├── config/        project settings and root urls
+├── core/          health check and error handling
 ├── accounts/      registration and login
 ├── patients/      patient records
 ├── doctors/       doctor records
 ├── mappings/      patient and doctor assignments
 ├── postman/       postman collection
+├── Dockerfile
+├── docker-compose.yml
 ├── manage.py
 ├── requirements.txt
 └── .env.example
@@ -59,6 +64,19 @@ Run tests:
 python manage.py test
 ```
 
+## Run with Docker
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The API is available at `http://localhost:8000`.
+
+## API Docs
+
+Swagger UI is available at `/api/docs/` and the OpenAPI schema at `/api/schema/`.
+
 ## Environment Variables
 
 | Variable | Description |
@@ -72,6 +90,8 @@ python manage.py test
 | DB_HOST | PostgreSQL host |
 | DB_PORT | PostgreSQL port |
 | ACCESS_TOKEN_MINUTES | Access token lifetime |
+| PAGE_SIZE | Items per page on list endpoints |
+| AUTH_THROTTLE_RATE | Rate limit for login and register |
 | REFRESH_TOKEN_DAYS | Refresh token lifetime |
 
 ## API Endpoints
@@ -114,6 +134,26 @@ All endpoints except register and login need the header `Authorization: Bearer <
 | GET | /api/mappings/ | List mappings of the user's patients |
 | GET | /api/mappings/<patient_id>/ | Doctors assigned to a patient |
 | DELETE | /api/mappings/<id>/ | Remove a doctor from a patient |
+
+## Extra Features
+
+- Pagination on list endpoints with `?page=2`
+- Search with `?search=`, ordering with `?ordering=-created_at`
+- Patients can be filtered with `?gender=male`, doctors with `?specialization=cardiology`
+- Rate limiting on login and register
+- Same JSON structure for every error response
+- Health check at `GET /api/health/`
+
+Error response format:
+
+```json
+{
+  "success": false,
+  "status_code": 400,
+  "message": "Validation failed.",
+  "errors": {"email": ["A user with this email already exists."]}
+}
+```
 
 ## Postman
 
