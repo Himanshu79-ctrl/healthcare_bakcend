@@ -7,8 +7,16 @@ from .serializers import DoctorSerializer
 
 
 class DoctorListCreateView(generics.ListCreateAPIView):
-    queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
+    search_fields = ["name", "specialization", "email"]
+    ordering_fields = ["name", "experience_years", "created_at"]
+
+    def get_queryset(self):
+        queryset = Doctor.objects.all()
+        specialization = self.request.query_params.get("specialization")
+        if specialization:
+            queryset = queryset.filter(specialization__iexact=specialization)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)

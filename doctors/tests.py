@@ -33,10 +33,17 @@ class DoctorTests(APITestCase):
     def test_everyone_can_list_doctors(self):
         Doctor.objects.create(created_by=self.other, **self.payload)
         response = self.client.get(reverse("doctor-list"))
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_only_creator_can_modify(self):
         doctor = Doctor.objects.create(created_by=self.other, **self.payload)
         url = reverse("doctor-detail", args=[doctor.id])
         self.assertEqual(self.client.put(url, self.payload, format="json").status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(self.client.delete(url).status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_filter_by_specialization(self):
+        Doctor.objects.create(created_by=self.user, **self.payload)
+        other = {**self.payload, "email": "raj@clinic.com", "specialization": "Neurology"}
+        Doctor.objects.create(created_by=self.user, **other)
+        response = self.client.get(reverse("doctor-list"), {"specialization": "neurology"})
+        self.assertEqual(len(response.data["results"]), 1)

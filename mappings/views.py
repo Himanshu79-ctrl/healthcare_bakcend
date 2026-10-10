@@ -11,6 +11,8 @@ from .serializers import MappingSerializer
 
 class MappingListCreateView(generics.ListCreateAPIView):
     serializer_class = MappingSerializer
+    search_fields = ["patient__name", "doctor__name"]
+    ordering_fields = ["assigned_at"]
 
     def get_queryset(self):
         return PatientDoctorMapping.objects.filter(

@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -5,6 +6,7 @@ from rest_framework.test import APITestCase
 
 class AuthTests(APITestCase):
     def setUp(self):
+        cache.clear()
         self.register_url = reverse("register")
         self.login_url = reverse("login")
         self.payload = {

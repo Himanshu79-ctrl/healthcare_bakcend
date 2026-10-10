@@ -34,7 +34,7 @@ class PatientTests(APITestCase):
         Patient.objects.create(created_by=self.other, **self.payload)
         Patient.objects.create(created_by=self.user, **self.payload)
         response = self.client.get(reverse("patient-list"))
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_cannot_access_other_users_patient(self):
         patient = Patient.objects.create(created_by=self.other, **self.payload)
@@ -49,3 +49,19 @@ class PatientTests(APITestCase):
         self.assertEqual(response.data["age"], 40)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_search_and_filter(self):
+        Patient.objects.create(created_by=self.user, name="Sunita", age=50, gender="female", phone="9000011111")
+        Patient.objects.create(created_by=self.user, **self.payload)
+        url = reverse("patient-list")
+        response = self.client.get(url, {"search": "sun"})
+        self.assertEqual(len(response.data["results"]), 1)
+        response = self.client.get(url, {"gender": "male"})
+        self.assertEqual(len(response.data["results"]), 1)
+        response = self.client.get(url, {"ordering": "-age"})
+        self.assertEqual(response.data["results"][0]["name"], "Sunita")
+
+    def test_error_format(self):
+        response = self.client.post(reverse("patient-list"), {}, format="json")
+        self.assertFalse(response.data["success"])
+        self.assertIn("name", response.data["errors"])
