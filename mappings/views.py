@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,6 +22,7 @@ class MappingListCreateView(generics.ListCreateAPIView):
 
 
 class MappingDetailView(APIView):
+    @extend_schema(responses=MappingSerializer(many=True))
     def get(self, request, pk):
         patient = get_object_or_404(Patient, pk=pk, created_by=request.user)
         mappings = PatientDoctorMapping.objects.filter(patient=patient).select_related(
@@ -29,6 +31,7 @@ class MappingDetailView(APIView):
         serializer = MappingSerializer(mappings, many=True, context={"request": request})
         return Response(serializer.data)
 
+    @extend_schema(responses={204: None})
     def delete(self, request, pk):
         mapping = get_object_or_404(
             PatientDoctorMapping, pk=pk, patient__created_by=request.user
