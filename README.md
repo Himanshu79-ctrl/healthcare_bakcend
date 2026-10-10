@@ -20,6 +20,7 @@ healthcare_backend/
 ├── patients/      patient records
 ├── doctors/       doctor records
 ├── mappings/      patient and doctor assignments
+├── postman/       postman collection
 ├── manage.py
 ├── requirements.txt
 └── .env.example
@@ -83,6 +84,7 @@ All endpoints except register and login need the header `Authorization: Bearer <
 |---|---|---|
 | POST | /api/auth/register/ | Register with name, email, password |
 | POST | /api/auth/login/ | Login and get JWT tokens |
+| POST | /api/auth/token/refresh/ | Get a new access token using the refresh token |
 
 ### Patients
 
@@ -112,6 +114,10 @@ All endpoints except register and login need the header `Authorization: Bearer <
 | GET | /api/mappings/ | List mappings of the user's patients |
 | GET | /api/mappings/<patient_id>/ | Doctors assigned to a patient |
 | DELETE | /api/mappings/<id>/ | Remove a doctor from a patient |
+
+## Postman
+
+Import `postman/healthcare_backend.postman_collection.json` into Postman. Run the Login request first, it stores the access token in a collection variable and all other requests use it automatically.
 
 ## Sample Requests
 
