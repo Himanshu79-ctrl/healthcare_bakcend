@@ -155,10 +155,6 @@ Error response format:
 }
 ```
 
-## Postman
-
-Import `postman/healthcare_backend.postman_collection.json` into Postman. Run the Login request first, it stores the access token in a collection variable and all other requests use it automatically.
-
 ## Sample Requests
 
 Register
